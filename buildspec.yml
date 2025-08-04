@@ -1,0 +1,27 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      java: corretto11
+    commands: 
+      - echo "Installing tools..."
+      - apt-get update && apt-get install -y jq curl unzip
+  pre_build:
+    commands:
+      - echo "Starting SonarCloud Analysis SAST...."
+      - mvn verify sonar:sonar -Dsonar.projectKey=pwn-space_ivm-devsecops-innovations-poc -Dsonar.organization=pwn-space -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=86148867b55c2428b6d53e4b29dabb17903be242
+  build:
+    commands:
+      - echo "Waiting for SonarCloud Quality Gate result..."
+      - sleep 15
+      - curl -s 'https://sonarcloud.io/api/qualitygates/project_status?projectKey=pwn-space_ivm-devsecops-innovations-poc' -o qualitygate.json
+      - cat qualitygate.json | jq .
+      - |
+        QG_STATUS=$(jq -r .projectStatus.status qualitygate.json)
+        echo "Quality Gate status: $QG_STATUS"
+        if [ "$QG_STATUS" = "ERROR" ]; then
+          echo "Quality Gate failed. Failing the build."
+          exit 1
+        else
+          echo "Quality Gate passed."
+        fi
