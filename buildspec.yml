@@ -9,7 +9,7 @@ phases:
   pre_build:
     commands:
       - echo "Starting SonarCloud Analysis SAST...."
-      - mvn verify sonar:sonar -Dsonar.projectKey=pwn-space_ivm-devsecops-innovations-poc -Dsonar.organization=pwn-space -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=86148867b55c2428b6d53e4b29dabb17903be242
+      - mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=pwn-space_ivm-devsecops-innovations-poc -Dsonar.organization=pwn-space -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=86148867b55c2428b6d53e4b29dabb17903be242
   build:
     commands:
       - echo "Waiting for SonarCloud Quality Gate result..."
